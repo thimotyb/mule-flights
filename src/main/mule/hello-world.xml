@@ -14,9 +14,20 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</db:config>
 	<flow name="getAllFlights" doc:id="968d9d07-c90d-4605-a822-bf7dd61f958f" >
 		<http:listener doc:name="GET /flights" doc:id="77168815-689a-4612-9a24-642bcff625f7" config-ref="HTTP_Listener_config" path="/flights" allowedMethods="GET"/>
-		<db:select doc:name="Select all flights" doc:id="40fb7686-9a70-401a-895c-53e139d0a19e" config-ref="Database_Config">
-			<db:sql ><![CDATA[SELECT * FROM american]]></db:sql>
+		<set-variable value="#[message.attributes.queryParams.destination]" doc:name="Set Variable" doc:id="d33cf0e2-ea3f-448d-8b9e-a4b1f182ae1b" variableName="destination"/>
+		<choice doc:name="Choice" doc:id="c80e3218-ad8b-46a6-9a8c-334f499d033d" >
+			<when expression="#[vars.destination == null]">
+				<db:select doc:name="Select all flights" doc:id="40fb7686-9a70-401a-895c-53e139d0a19e" config-ref="Database_Config">
+			<db:sql><![CDATA[SELECT * FROM american]]></db:sql>
 		</db:select>
+			</when>
+			<otherwise >
+				<db:select doc:name="Select all flights with destination" doc:id="e43534c1-2647-49ff-ac5a-9a0a23358773" config-ref="Database_Config">
+					<db:sql ><![CDATA[SELECT * from american where toAirport = :destination]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{ "destination": vars.destination }]]]></db:input-parameters>
+				</db:select>
+			</otherwise>
+		</choice>
 		<ee:transform doc:name="Transform Message" doc:id="edc1a6b6-f884-4b1f-9eec-4e334ca67c96" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
