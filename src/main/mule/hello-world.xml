@@ -14,6 +14,9 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 		<db:my-sql-connection host="mudb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
 	</db:config>
 	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="80551055-efe5-432f-8121-aa5b601ca96d" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="ddc1ab04-46bf-4a28-9186-01b297a07365" basePath="/api/timezone" >
+		<http:request-connection host="worldtimeapi.org" port="80" />
+	</http:request-config>
 	<flow name="getAllFlights" doc:id="968d9d07-c90d-4605-a822-bf7dd61f958f" >
 		<http:listener doc:name="GET /flights" doc:id="77168815-689a-4612-9a24-642bcff625f7" config-ref="HTTP_Listener_config" path="/flights" allowedMethods="GET"/>
 		<set-variable value="#[message.attributes.queryParams.destination]" doc:name="Set Variable" doc:id="d33cf0e2-ea3f-448d-8b9e-a4b1f182ae1b" variableName="destination"/>
@@ -65,5 +68,9 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+	</flow>
+	<flow name="hello-worldFlow" doc:id="23cdeead-a811-4f36-a3c3-68854b69e31d" >
+		<http:listener doc:name="GET /time" doc:id="0b7e348f-6cdc-4b15-8b00-5f6aedd86223" config-ref="HTTP_Listener_config" path="/time" allowedMethods="GET"/>
+		<http:request method="GET" doc:name="Request" doc:id="5e8a87cf-f539-420e-9a20-4ef0643d60c9" config-ref="HTTP_Request_configuration" path="/" responseTimeout="300000"/>
 	</flow>
 </mule>
